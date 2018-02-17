@@ -3,6 +3,10 @@ Replacement for RUSA ACP brevet time calculator
 (see https://rusa.org/octime_acp.html)
 
 """
+# Was able to get most of the functions workin, but kept getting a syntax error in def imply_types under the config.py file. Could not get the opening and closing times to be posted
+
+
+
 
 import flask
 from flask import request
@@ -55,10 +59,20 @@ def _calc_times():
     km = request.args.get('km', 999, type=float)
     app.logger.debug("km={}".format(km))
     app.logger.debug("request.args: {}".format(request.args))
+
+
+    b_dist = request.args.get('b_dist',type=int)
+    start_d = request.args.get('start_d',type=str)
+    start_time = request.args.get('start_time',type=str)
+    start = start_d +" "+ start_time
+    
+   
     # FIXME: These probably aren't the right open and close times
     # and brevets may be longer than 200km
-    open_time = acp_times.open_time(km, 200, arrow.now().isoformat)
-    close_time = acp_times.close_time(km, 200, arrow.now().isoformat)
+    
+    
+    open_time = acp_times.open_time(km,b_dist,start)
+    close_time = acp_times.close_time(km,b_dist,start)
     result = {"open": open_time, "close": close_time}
     return flask.jsonify(result=result)
 
@@ -70,5 +84,4 @@ if app.debug:
     app.logger.setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
-    print("Opening for global access on port {}".format(CONFIG.PORT))
     app.run(port=CONFIG.PORT, host="0.0.0.0")
